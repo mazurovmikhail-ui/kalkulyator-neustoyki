@@ -1,0 +1,624 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Калькулятор неустойки по ДДУ (214-ФЗ) и процентов по ст. 395 ГК РФ</title>
+<meta name="description" content="Расчёт неустойки застройщика за просрочку передачи объекта по ч. 2 ст. 6 ФЗ-214 с учётом ПП РФ № 326 и процентов по ст. 395 ГК РФ. Пораздельная таблица по ключевой ставке ЦБ РФ.">
+<meta property="og:title" content="Калькулятор неустойки по ДДУ и процентов по ст. 395 ГК РФ">
+<meta property="og:description" content="Расчёт по ч. 2 ст. 6 ФЗ-214 с учётом моратория ПП № 326 и по ст. 395 ГК РФ, с разбивкой по периодам ключевой ставки ЦБ.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>%E2%9A%96%EF%B8%8F</text></svg>">
+<style>*{margin:0}</style>
+</head>
+<body>
+<style>
+  :root{
+    --paper:#eef0f4; --surface:#ffffff; --surface-2:#f6f7fa;
+    --ink:#1a1d26; --muted:#5b6270; --faint:#8b91a0;
+    --line:#d7dbe3; --line-strong:#c2c7d2;
+    --accent:#234b8a; --accent-ink:#1c3d70; --accent-soft:#e7eef8;
+    --good:#1c7a4d; --good-soft:#e2f2ea;
+    --warn:#8a5a10; --warn-soft:#f6ecd8;
+    --crit:#9e2a20; --crit-soft:#f7e4e2;
+    --serif:Georgia,"Times New Roman",serif;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    --mono:"SF Mono","Cascadia Code","JetBrains Mono",Consolas,"Liberation Mono",monospace;
+    --sh:0 1px 2px rgba(20,25,40,.05),0 6px 20px rgba(20,25,40,.05);
+    --radius:12px;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --paper:#0f1218; --surface:#171b23; --surface-2:#1d222c;
+      --ink:#e7eaf1; --muted:#9aa2b3; --faint:#6b7384;
+      --line:#2a2f3b; --line-strong:#3a414f;
+      --accent:#7ea6e8; --accent-ink:#9cbcf0; --accent-soft:#1a2740;
+      --good:#57c48b; --good-soft:#132a20;
+      --warn:#d3a24e; --warn-soft:#2c2412;
+      --crit:#e6796d; --crit-soft:#2e1715;
+      --sh:0 1px 2px rgba(0,0,0,.3),0 8px 26px rgba(0,0,0,.32);
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#0f1218; --surface:#171b23; --surface-2:#1d222c;
+    --ink:#e7eaf1; --muted:#9aa2b3; --faint:#6b7384;
+    --line:#2a2f3b; --line-strong:#3a414f;
+    --accent:#7ea6e8; --accent-ink:#9cbcf0; --accent-soft:#1a2740;
+    --good:#57c48b; --good-soft:#132a20;
+    --warn:#d3a24e; --warn-soft:#2c2412;
+    --crit:#e6796d; --crit-soft:#2e1715;
+    --sh:0 1px 2px rgba(0,0,0,.3),0 8px 26px rgba(0,0,0,.32);
+  }
+  :root[data-theme="light"]{
+    --paper:#eef0f4; --surface:#ffffff; --surface-2:#f6f7fa;
+    --ink:#1a1d26; --muted:#5b6270; --faint:#8b91a0;
+    --line:#d7dbe3; --line-strong:#c2c7d2;
+    --accent:#234b8a; --accent-ink:#1c3d70; --accent-soft:#e7eef8;
+    --good:#1c7a4d; --good-soft:#e2f2ea;
+    --warn:#8a5a10; --warn-soft:#f6ecd8;
+    --crit:#9e2a20; --crit-soft:#f7e4e2;
+    --sh:0 1px 2px rgba(20,25,40,.05),0 6px 20px rgba(20,25,40,.05);
+  }
+
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
+    font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:960px;margin:0 auto;padding:28px 20px 64px;}
+
+  /* Masthead */
+  header.mast{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;
+    gap:16px;padding-bottom:20px;border-bottom:2px solid var(--ink);}
+  .mast h1{font-family:var(--serif);font-weight:600;font-size:clamp(23px,4vw,32px);
+    line-height:1.15;margin:0;text-wrap:balance;letter-spacing:-.01em;}
+  .mast .kicker{font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--accent);font-weight:600;margin-bottom:8px;}
+  .seal{flex:0 0 auto;border:1px solid var(--line-strong);border-radius:10px;
+    background:var(--surface);padding:10px 14px;font-size:12.5px;color:var(--muted);
+    box-shadow:var(--sh);max-width:260px;}
+  .seal b{color:var(--ink);font-variant-numeric:tabular-nums;}
+  .seal .live{display:flex;align-items:baseline;gap:8px;margin-bottom:4px;}
+  .seal .dot{width:8px;height:8px;border-radius:50%;background:var(--good);flex:0 0 auto;
+    align-self:center;box-shadow:0 0 0 3px var(--good-soft);}
+  .seal .rate-now{font-family:var(--serif);font-size:20px;color:var(--ink);font-weight:600;}
+
+  /* Tabs */
+  .tabs{display:flex;gap:4px;margin:24px 0 20px;border-bottom:1px solid var(--line);}
+  .tab{appearance:none;background:none;border:none;font-family:inherit;font-size:15px;
+    font-weight:600;color:var(--muted);padding:12px 16px;cursor:pointer;position:relative;
+    border-radius:8px 8px 0 0;}
+  .tab:hover{color:var(--ink);background:var(--surface-2);}
+  .tab[aria-selected="true"]{color:var(--accent);}
+  .tab[aria-selected="true"]::after{content:"";position:absolute;left:12px;right:12px;bottom:-1px;
+    height:2.5px;background:var(--accent);border-radius:2px;}
+  .tab:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+
+  .panel{display:none;}
+  .panel.active{display:block;animation:fade .25s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion:reduce){.panel.active{animation:none}}
+
+  .grid{display:grid;grid-template-columns:1fr;gap:20px;}
+  @media (min-width:760px){.grid{grid-template-columns:minmax(0,340px) minmax(0,1fr);align-items:start;}}
+
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--sh);padding:20px;}
+  .card h2{font-family:var(--serif);font-size:17px;margin:0 0 4px;font-weight:600;}
+  .card .hint{font-size:12.5px;color:var(--faint);margin:0 0 16px;}
+
+  .field{margin-bottom:15px;}
+  .field:last-child{margin-bottom:0;}
+  label.lbl{display:block;font-size:13px;font-weight:600;color:var(--muted);margin-bottom:5px;}
+  label.lbl .q{color:var(--faint);font-weight:400;cursor:help;}
+  input[type=text],input[type=date],input[type=number]{width:100%;font-family:inherit;
+    font-size:15px;color:var(--ink);background:var(--surface-2);border:1px solid var(--line-strong);
+    border-radius:8px;padding:9px 11px;font-variant-numeric:tabular-nums;}
+  input:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent);}
+  input::placeholder{color:var(--faint);}
+  .suffix{position:relative;}
+  .suffix span{position:absolute;right:11px;top:50%;transform:translateY(-50%);
+    color:var(--faint);font-size:13px;pointer-events:none;}
+
+  .seg{display:flex;gap:0;border:1px solid var(--line-strong);border-radius:8px;overflow:hidden;}
+  .seg button{flex:1;appearance:none;background:var(--surface-2);border:none;font-family:inherit;
+    font-size:13.5px;font-weight:600;color:var(--muted);padding:9px 6px;cursor:pointer;}
+  .seg button+button{border-left:1px solid var(--line-strong);}
+  .seg button[aria-pressed="true"]{background:var(--accent);color:#fff;}
+  :root[data-theme="dark"] .seg button[aria-pressed="true"]{color:#0f1218;}
+  @media (prefers-color-scheme:dark){.seg button[aria-pressed="true"]{color:#0f1218;}}
+
+  .check{display:flex;gap:9px;align-items:flex-start;font-size:13.5px;color:var(--ink);
+    cursor:pointer;user-select:none;}
+  .check input{margin-top:2px;width:16px;height:16px;accent-color:var(--accent);flex:0 0 auto;}
+  .check .sub{color:var(--faint);font-size:12px;}
+
+  .rate-row{display:flex;align-items:center;gap:10px;}
+  .rate-row input{flex:0 0 92px;}
+  .rate-auto{font-size:12px;color:var(--muted);}
+  .rate-auto b{color:var(--ink);}
+  .linkish{background:none;border:none;color:var(--accent);font:inherit;font-size:12px;
+    cursor:pointer;padding:0;text-decoration:underline;text-underline-offset:2px;}
+
+  /* Result */
+  .result h2{font-family:var(--serif);font-size:17px;margin:0 0 14px;font-weight:600;}
+  .headline{border:1px solid var(--line);border-radius:var(--radius);background:var(--surface-2);
+    padding:18px 20px;margin-bottom:18px;}
+  .headline .lab{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);
+    font-weight:600;}
+  .headline .sum{font-family:var(--serif);font-size:clamp(28px,6vw,40px);font-weight:700;
+    line-height:1.1;font-variant-numeric:tabular-nums;letter-spacing:-.01em;margin-top:2px;}
+  .headline .sub{font-size:13px;color:var(--muted);margin-top:6px;}
+
+  .stat-row{display:flex;flex-wrap:wrap;gap:8px 22px;margin-bottom:18px;}
+  .stat{font-size:13px;color:var(--muted);}
+  .stat b{display:block;font-family:var(--serif);font-size:18px;color:var(--ink);font-weight:600;
+    font-variant-numeric:tabular-nums;}
+
+  .tbl-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:10px;}
+  table{border-collapse:collapse;width:100%;font-size:13px;min-width:460px;}
+  th,td{padding:8px 11px;text-align:right;border-bottom:1px solid var(--line);
+    font-variant-numeric:tabular-nums;white-space:nowrap;}
+  th:first-child,td:first-child{text-align:left;}
+  thead th{background:var(--surface-2);font-size:11px;letter-spacing:.04em;text-transform:uppercase;
+    color:var(--muted);font-weight:600;position:sticky;top:0;}
+  tbody tr:last-child td{border-bottom:none;}
+  tfoot td{font-weight:700;background:var(--surface-2);border-top:1px solid var(--line-strong);}
+  tr.mor td{color:var(--faint);font-style:italic;}
+  .tag{display:inline-block;font-size:11px;font-weight:600;padding:1px 7px;border-radius:20px;
+    background:var(--warn-soft);color:var(--warn);vertical-align:middle;}
+  .tag.cap{background:var(--accent-soft);color:var(--accent-ink);}
+
+  .note{font-size:12.5px;color:var(--muted);margin-top:16px;padding-left:12px;
+    border-left:3px solid var(--line-strong);}
+  .note.warn{border-color:var(--warn);}
+  .note b{color:var(--ink);}
+
+  details.disc,details.ref{margin-top:16px;background:var(--surface);border:1px solid var(--line);
+    border-radius:10px;padding:0 16px;box-shadow:var(--sh);}
+  details summary{cursor:pointer;padding:14px 0;font-weight:600;font-size:14px;list-style:none;
+    display:flex;align-items:center;gap:8px;}
+  details summary::-webkit-details-marker{display:none;}
+  details summary::before{content:"▸";color:var(--accent);font-size:12px;transition:transform .15s;}
+  details[open] summary::before{transform:rotate(90deg);}
+  details .body{padding:0 0 16px;font-size:13.5px;color:var(--muted);line-height:1.6;}
+  details .body p{margin:0 0 10px;}
+  details .body b{color:var(--ink);}
+  details .body a{color:var(--accent);}
+
+  .ref-grid{columns:2;column-gap:24px;font-size:12.5px;font-variant-numeric:tabular-nums;}
+  @media (max-width:560px){.ref-grid{columns:1;}}
+  .ref-grid div{break-inside:avoid;display:flex;justify-content:space-between;gap:12px;
+    padding:2px 0;border-bottom:1px dotted var(--line);}
+  .ref-grid .r{color:var(--ink);font-weight:600;}
+
+  footer.foot{margin-top:34px;padding-top:18px;border-top:1px solid var(--line);
+    font-size:12px;color:var(--faint);line-height:1.6;}
+
+  .themebtn{position:fixed;top:14px;right:14px;z-index:10;appearance:none;border:1px solid var(--line-strong);
+    background:var(--surface);color:var(--muted);border-radius:20px;padding:6px 12px;font:inherit;
+    font-size:12px;cursor:pointer;box-shadow:var(--sh);}
+  .themebtn:hover{color:var(--ink);}
+  .err{color:var(--crit);font-size:12.5px;margin-top:6px;display:none;}
+  .err.show{display:block;}
+</style>
+
+<button class="themebtn" id="themebtn" type="button">Тема</button>
+
+<div class="wrap">
+  <header class="mast">
+    <div>
+      <div class="kicker">Расчёт финансовых санкций · РФ</div>
+      <h1>Неустойка по ДДУ и проценты по ст. 395 ГК РФ</h1>
+    </div>
+    <div class="seal">
+      <div class="live"><span class="dot"></span><span>Ключевая ставка ЦБ РФ</span></div>
+      <div><span class="rate-now" id="rateNow">14,00%</span></div>
+      <div>проверено по данным Банка России<br><b id="verDate">31.07.2026</b></div>
+    </div>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" aria-selected="true" id="tab-ddu" aria-controls="panel-ddu">Неустойка застройщика (214-ФЗ)</button>
+    <button class="tab" role="tab" aria-selected="false" id="tab-395" aria-controls="panel-395">Проценты по ст. 395 ГК</button>
+  </div>
+
+  <!-- ============ ДДУ ============ -->
+  <section class="panel active" id="panel-ddu" role="tabpanel" aria-labelledby="tab-ddu">
+    <div class="grid">
+      <div class="card">
+        <h2>Условия</h2>
+        <p class="hint">Просрочка передачи объекта долевого строительства, ч. 2 ст. 6 № 214-ФЗ.</p>
+
+        <div class="field">
+          <label class="lbl" for="d_price">Цена договора (ДДУ)</label>
+          <div class="suffix">
+            <input type="text" id="d_price" inputmode="decimal" placeholder="5 400 000" autocomplete="off">
+            <span>₽</span>
+          </div>
+          <div class="err" id="d_price_err">Введите цену договора</div>
+        </div>
+
+        <div class="field">
+          <label class="lbl" for="d_due">Срок передачи по договору <span class="q" title="Последний день, когда объект должен был быть передан по ДДУ. По ВС № 41-КГ17-26 ставка берётся на этот день.">— последний день ⓘ</span></label>
+          <input type="date" id="d_due">
+        </div>
+
+        <div class="field">
+          <label class="lbl" for="d_end">Дата фактической передачи <span class="q" title="День подписания акта приёма-передачи. Если объект ещё не передан — оставьте сегодняшнюю дату.">(или расчёта) ⓘ</span></label>
+          <input type="date" id="d_end">
+        </div>
+
+        <div class="field">
+          <label class="lbl">Кто дольщик</label>
+          <div class="seg" id="d_who">
+            <button type="button" data-v="citizen" aria-pressed="true">Гражданин · 1/150</button>
+            <button type="button" data-v="org" aria-pressed="false">Юрлицо · 1/300</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="lbl">Ключевая ставка для расчёта</label>
+          <div class="rate-row">
+            <div class="suffix" style="flex:0 0 92px">
+              <input type="text" id="d_rate" inputmode="decimal">
+              <span>%</span>
+            </div>
+            <div class="rate-auto">на срок передачи: <b id="d_rate_auto">—</b>
+              <button class="linkish" type="button" id="d_rate_reset">вернуть</button></div>
+          </div>
+        </div>
+
+        <div class="field" style="margin-top:18px">
+          <label class="check">
+            <input type="checkbox" id="d_pp326" checked>
+            <span>Применить ПП РФ № 326<br><span class="sub">мораторий 22.03.2024–31.12.2025 + потолок ставки 7,5%</span></span>
+          </label>
+        </div>
+
+        <div class="field">
+          <label class="check">
+            <input type="checkbox" id="d_shtraf">
+            <span>Добавить штраф по ЗоЗПП / ст. 10 214-ФЗ<span class="sub" id="d_shtraf_sub"></span></span>
+          </label>
+          <div id="d_shtraf_box" style="display:none;margin-top:12px">
+            <div class="seg" id="d_shtraf_pct" style="margin-bottom:10px">
+              <button type="button" data-v="50" aria-pressed="true">50% (до 01.09.2024)</button>
+              <button type="button" data-v="5" aria-pressed="false">5% (после)</button>
+            </div>
+            <label class="lbl" for="d_morvred">Моральный вред в базу штрафа (по решению суда)</label>
+            <div class="suffix"><input type="text" id="d_morvred" inputmode="decimal" placeholder="0" autocomplete="off"><span>₽</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="result">
+        <h2>Результат</h2>
+        <div class="headline">
+          <div class="lab">Неустойка за просрочку</div>
+          <div class="sum" id="d_sum">—</div>
+          <div class="sub" id="d_sub">Заполните цену и даты</div>
+        </div>
+        <div class="stat-row" id="d_stats"></div>
+        <div class="tbl-scroll" id="d_tbl_wrap" style="display:none">
+          <table>
+            <thead><tr><th>Период</th><th>Дней</th><th>Ставка</th><th>Формула</th><th>Сумма, ₽</th></tr></thead>
+            <tbody id="d_tbody"></tbody>
+            <tfoot id="d_tfoot"></tfoot>
+          </table>
+        </div>
+        <div class="note" id="d_shtraf_note" style="display:none"></div>
+        <div class="note warn">
+          <b>Как считается.</b> Неустойка = цена × ставка × дни × <span id="d_coef_txt">1/150</span>.
+          Ставка — на последний день срока передачи (ВС № 41-КГ17-26). При ПП № 326 дни моратория
+          не начисляются, а для периода 01.07.2023–31.12.2025 ставка ограничена 7,5%. Суд вправе
+          снизить неустойку по ст. 333 ГК — калькулятор даёт расчётный максимум.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 395 ============ -->
+  <section class="panel" id="panel-395" role="tabpanel" aria-labelledby="tab-395">
+    <div class="grid">
+      <div class="card">
+        <h2>Условия</h2>
+        <p class="hint">Проценты за пользование чужими денежными средствами, ст. 395 ГК РФ.</p>
+
+        <div class="field">
+          <label class="lbl" for="p_debt">Сумма долга</label>
+          <div class="suffix"><input type="text" id="p_debt" inputmode="decimal" placeholder="300 000" autocomplete="off"><span>₽</span></div>
+          <div class="err" id="p_debt_err">Введите сумму долга</div>
+        </div>
+
+        <div class="field">
+          <label class="lbl" for="p_from">Первый день просрочки <span class="q" title="День, следующий за днём, когда обязательство должно было быть исполнено (п. 1 ст. 395 ГК).">ⓘ</span></label>
+          <input type="date" id="p_from">
+        </div>
+
+        <div class="field">
+          <label class="lbl" for="p_to">По дату (включительно)</label>
+          <input type="date" id="p_to">
+        </div>
+
+        <div class="field">
+          <label class="check">
+            <input type="checkbox" id="p_pp326">
+            <span>Ограничить ставку по ПП № 326 (7,5%)<br><span class="sub">если это санкции застройщика по ДДУ за 01.07.2023–31.12.2025</span></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="result">
+        <h2>Результат</h2>
+        <div class="headline">
+          <div class="lab">Проценты по ст. 395 ГК РФ</div>
+          <div class="sum" id="p_sum">—</div>
+          <div class="sub" id="p_sub">Заполните сумму и даты</div>
+        </div>
+        <div class="stat-row" id="p_stats"></div>
+        <div class="tbl-scroll" id="p_tbl_wrap" style="display:none">
+          <table>
+            <thead><tr><th>Период</th><th>Дней</th><th>Ставка</th><th>Дней в году</th><th>Сумма, ₽</th></tr></thead>
+            <tbody id="p_tbody"></tbody>
+            <tfoot id="p_tfoot"></tfoot>
+          </table>
+        </div>
+        <div class="note warn">
+          <b>Как считается.</b> За каждый период действия ключевой ставки: долг × ставка × дни ÷
+          число дней в году (365 или 366). Ставки за периоды суммируются (п. 1 ст. 395 ГК; порядок —
+          Пленум ВС № 7 от 24.03.2016). До 01.08.2016 применялись средние ставки по вкладам —
+          калькулятор считает по ключевой ставке (для периодов с 01.08.2016).
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <details class="ref">
+    <summary>Ключевая ставка ЦБ РФ — история изменений</summary>
+    <div class="body">
+      <p style="font-size:12px;margin-bottom:12px">Дата — день, с которого действует ставка. Источник — Банк России (cbr.ru), проверено 31.07.2026.</p>
+      <div class="ref-grid" id="refGrid"></div>
+    </div>
+  </details>
+
+  <details class="disc">
+    <summary>Правовая основа и оговорки</summary>
+    <div class="body">
+      <p><b>Неустойка застройщика</b> — ч. 2 ст. 6 № 214-ФЗ: 1/300 ключевой ставки ЦБ за каждый день просрочки от цены договора; гражданину — в двойном размере (1/150). Ставка — на последний день срока передачи по договору (позиция ВС РФ № 41-КГ17-26).</p>
+      <p><b>ПП РФ № 326 от 18.03.2024</b> (ред. от 30.12.2025): неустойка и иные санкции гражданам-дольщикам не начисляются за период с 22.03.2024 по 31.12.2025; за период с 01.07.2023 по 31.12.2025 ставка берётся на день исполнения, но не выше 7,5% (ставка на 01.07.2023). С 01.01.2026 начисление за новые периоды возобновилось; отсрочка уплаты ранее начисленного — до 31.12.2026. Практика по границам моратория расходится — проверяйте по своему делу.</p>
+      <p><b>Штраф</b> — 50% от присуждённого (п. 6 ст. 13 ЗоЗПП), если право на него возникло до 01.09.2024; 5% (ч. 3 ст. 10 214-ФЗ) — если после (КС РФ № 24-П от 14.04.2026). Если досудебная претензия предъявлена в период моратория — штраф может не взыскиваться.</p>
+      <p><b>Проценты по ст. 395 ГК</b> — определяются ключевой ставкой ЦБ за соответствующие периоды; начисляются по день уплаты включительно (п. 48 Пленума ВС № 7).</p>
+      <p>Калькулятор даёт арифметический расчёт по действующим нормам и не заменяет юридическую консультацию. Суд вправе снизить неустойку и штраф по ст. 333 ГК. Проверяйте ставку и период по своему делу.</p>
+    </div>
+  </details>
+
+  <footer class="foot">
+    Данные ключевой ставки — Банк России, cbr.ru/hd_base/KeyRate. Расчёт по ст. 6 № 214-ФЗ,
+    ПП РФ № 326, ст. 395 ГК РФ. Обновление ставок — при изменении ЦБ (последняя проверка 31.07.2026).
+  </footer>
+</div>
+
+<script>
+"use strict";
+
+/* Ключевая ставка ЦБ РФ. [дата вступления в силу, % годовых].
+   2021–2026 сверены по cbr.ru/hd_base/KeyRate (31.07.2026); до 2021 — официальный ряд ЦБ.
+   Обновление: добавьте новую строку при изменении ставки Банком России. */
+const RATES = [
+  ["2016-01-01",11.00],["2016-06-14",10.50],["2016-09-19",10.00],
+  ["2017-03-27",9.75],["2017-05-02",9.25],["2017-06-19",9.00],["2017-09-18",8.50],
+  ["2017-10-30",8.25],["2017-12-18",7.75],
+  ["2018-02-12",7.50],["2018-03-26",7.25],["2018-09-17",7.50],["2018-12-17",7.75],
+  ["2019-06-17",7.50],["2019-07-29",7.25],["2019-09-09",7.00],["2019-10-28",6.50],["2019-12-16",6.25],
+  ["2020-02-10",6.00],["2020-04-27",5.50],["2020-06-22",4.50],["2020-07-27",4.25],
+  ["2021-03-22",4.50],["2021-04-26",5.00],["2021-06-15",5.50],["2021-07-26",6.50],
+  ["2021-09-13",6.75],["2021-10-25",7.50],["2021-12-20",8.50],
+  ["2022-02-14",9.50],["2022-02-28",20.00],["2022-04-11",17.00],["2022-05-04",14.00],
+  ["2022-05-27",11.00],["2022-06-14",9.50],["2022-07-25",8.00],["2022-09-19",7.50],
+  ["2023-07-24",8.50],["2023-08-15",12.00],["2023-09-18",13.00],["2023-10-30",15.00],["2023-12-18",16.00],
+  ["2024-07-29",18.00],["2024-09-16",19.00],["2024-10-28",21.00],
+  ["2025-06-09",20.00],["2025-07-28",18.00],["2025-09-15",17.00],["2025-10-27",16.50],["2025-12-22",16.00],
+  ["2026-02-16",15.50],["2026-03-23",15.00],["2026-04-27",14.50],["2026-06-22",14.25],["2026-07-27",14.00]
+];
+const VERIFIED = "31.07.2026";
+
+const DAY = 86400000;
+const parseISO = s => { const [y,m,d]=s.split("-").map(Number); return Date.UTC(y,m-1,d); };
+const RATE_MS = RATES.map(r => [parseISO(r[0]), r[1]]);
+function rateOn(ms){ let v=RATE_MS[0][1]; for(const [t,r] of RATE_MS){ if(t<=ms) v=r; else break; } return v; }
+const isLeap = y => (y%4===0 && y%100!==0) || y%400===0;
+const yearDays = y => isLeap(y) ? 366 : 365;
+const dcount = (a,b) => Math.round((b-a)/DAY)+1;
+
+function fmtDate(ms){ const d=new Date(ms);
+  return String(d.getUTCDate()).padStart(2,"0")+"."+String(d.getUTCMonth()+1).padStart(2,"0")+"."+d.getUTCFullYear(); }
+const nf0 = new Intl.NumberFormat("ru-RU",{maximumFractionDigits:0});
+const nf2 = new Intl.NumberFormat("ru-RU",{minimumFractionDigits:2,maximumFractionDigits:2});
+const money = v => nf2.format(v).replace(/ /g," ");
+const rub = v => money(v)+" ₽";
+const pct = v => (Number.isInteger(v) ? String(v) : String(v).replace(".", ",")) + "%";
+function parseNum(s){ if(!s) return NaN; return parseFloat(String(s).replace(/[\s ]/g,"").replace(",",".")); }
+function todayISO(){ const d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+
+/* thousands grouping on money text inputs */
+function groupInput(el){
+  el.addEventListener("input",()=>{
+    const caretEnd = el.selectionStart === el.value.length;
+    let raw = el.value.replace(/[^\d,]/g,"");
+    const parts = raw.split(",");
+    let intp = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g," ");
+    el.value = parts.length>1 ? intp+","+parts[1].slice(0,2) : intp;
+    if(caretEnd) el.setSelectionRange(el.value.length, el.value.length);
+    recalcAll();
+  });
+}
+
+/* ---------- Constants ПП 326 ---------- */
+const MOR_S = parseISO("2024-03-22"), MOR_E = parseISO("2025-12-31");
+const CAP_F = parseISO("2023-07-01"), CAP = 7.5;
+
+/* ---------- ДДУ neustойka ---------- */
+function segments214(startMs,endMs,base,pp326){
+  const segs=[];
+  if(endMs<startMs) return segs;
+  if(!pp326){ segs.push({from:startMs,to:endMs,days:dcount(startMs,endMs),rate:base}); return segs; }
+  const stops=[...new Set([CAP_F,MOR_S,MOR_E+DAY].filter(t=>t>startMs && t<=endMs))].sort((a,b)=>a-b);
+  const pts=[startMs,...stops];
+  for(let i=0;i<pts.length;i++){
+    const a=pts[i]; if(a>endMs) break;
+    const b=Math.min(i+1<pts.length? pts[i+1]-DAY : endMs, endMs);
+    const inMor = a>=MOR_S && a<=MOR_E;
+    if(inMor){ segs.push({from:a,to:b,days:dcount(a,b),rate:0,mor:true}); continue; }
+    const capped = a>=CAP_F && b<=MOR_E && base>CAP;
+    segs.push({from:a,to:b,days:dcount(a,b),rate:capped?CAP:base,capped});
+  }
+  return segs;
+}
+
+const el = id => document.getElementById(id);
+const D = { who:"citizen", shtraf:"50" };
+
+function recalcDDU(){
+  const price = parseNum(el("d_price").value);
+  const dueV = el("d_due").value, endV = el("d_end").value;
+  const coef = D.who==="citizen" ? 1/150 : 1/300;
+  el("d_coef_txt").textContent = D.who==="citizen" ? "1/150" : "1/300";
+
+  // auto rate on срок передачи
+  let autoRate = null;
+  if(dueV){ autoRate = rateOn(parseISO(dueV)); el("d_rate_auto").textContent = pct(autoRate); }
+  else el("d_rate_auto").textContent = "—";
+  if(el("d_rate").dataset.touched!=="1" && autoRate!=null) el("d_rate").value = String(autoRate).replace(".", ",");
+
+  const rate = parseNum(el("d_rate").value);
+  const ok = price>0 && dueV && endV && rate>0;
+  const errC = !(price>0);
+  el("d_price_err").classList.toggle("show", el("d_price").value!=="" && errC);
+
+  if(!ok){ el("d_sum").textContent="—"; el("d_sub").textContent="Заполните цену, даты и ставку";
+    el("d_tbl_wrap").style.display="none"; el("d_stats").innerHTML=""; el("d_shtraf_note").style.display="none"; return; }
+
+  const start = parseISO(dueV)+DAY, end = parseISO(endV);
+  const pp326 = el("d_pp326").checked;
+  const segs = segments214(start,end,rate,pp326);
+
+  let total=0, accrDays=0, morDays=0;
+  const rows = segs.map(s=>{
+    const sum = price*(s.rate/100)*coef*s.days;
+    total+=sum; if(s.mor) morDays+=s.days; else accrDays+=s.days;
+    const formula = s.mor ? "—" : `${nf0.format(price)}×${pct(s.rate)}×${s.days}×${D.who==="citizen"?"1/150":"1/300"}`;
+    const rateCell = s.mor ? '<span class="tag">мораторий</span>'
+      : pct(s.rate)+(s.capped? ' <span class="tag cap" title="Ставка ограничена потолком 7,5% по п. 2 ПП РФ № 326">потолок</span>' : '');
+    return `<tr class="${s.mor?'mor':''}"><td>${fmtDate(s.from)} – ${fmtDate(s.to)}</td><td>${s.days}</td><td>${rateCell}</td><td style="font-family:var(--mono);font-size:11.5px">${formula}</td><td>${s.mor?"0,00":money(sum)}</td></tr>`;
+  }).join("");
+
+  el("d_tbody").innerHTML = rows;
+  el("d_tfoot").innerHTML = `<tr><td>Итого неустойка</td><td>${accrDays}</td><td></td><td></td><td>${money(total)}</td></tr>`;
+  el("d_tbl_wrap").style.display="";
+  el("d_sum").textContent = rub(total);
+  const totalDays = dcount(start,end);
+  el("d_sub").textContent = `Просрочка ${fmtDate(start)} – ${fmtDate(end)} · ${totalDays} дн.` + (morDays?` (в т.ч. ${morDays} дн. моратория без начисления)`:"");
+  el("d_stats").innerHTML =
+    `<div class="stat"><b>${accrDays}</b>дней начислено</div>`+
+    (morDays?`<div class="stat"><b>${morDays}</b>дней моратория</div>`:"")+
+    `<div class="stat"><b>${pct(rate)}</b>ставка расчёта</div>`;
+
+  // штраф
+  if(el("d_shtraf").checked){
+    const mv = parseNum(el("d_morvred").value)||0;
+    const p = D.shtraf==="50"?0.5:0.05;
+    const base = total+mv, sh = base*p;
+    el("d_shtraf_note").style.display="";
+    el("d_shtraf_note").innerHTML = `<b>Штраф ${D.shtraf}%:</b> (${money(total)} неустойка${mv?` + ${money(mv)} морвред`:""}) × ${D.shtraf}% = <b>${rub(sh)}</b>. <br><span style="color:var(--faint)">Взыскивается при неисполнении досудебной претензии; в период моратория может не присуждаться.</span>`;
+  } else el("d_shtraf_note").style.display="none";
+}
+
+/* ---------- 395 ---------- */
+function segments395(startMs,endMs,capPP326){
+  const segs=[]; let cur=startMs;
+  while(cur<=endMs){
+    const y=new Date(cur).getUTCFullYear();
+    const nextYear=Date.UTC(y+1,0,1);
+    let nextRate=Infinity;
+    for(const [t] of RATE_MS){ if(t>cur){ nextRate=t; break; } }
+    let segEnd=Math.min(nextYear,nextRate)-DAY;
+    if(segEnd>endMs) segEnd=endMs;
+    let r=rateOn(cur), capped=false;
+    if(capPP326 && cur>=CAP_F && cur<=MOR_E && r>CAP){ r=CAP; capped=true; }
+    segs.push({from:cur,to:segEnd,days:dcount(cur,segEnd),rate:r,yd:yearDays(y),capped});
+    cur=segEnd+DAY;
+  }
+  return segs;
+}
+function recalc395(){
+  const debt=parseNum(el("p_debt").value);
+  const fV=el("p_from").value, tV=el("p_to").value;
+  el("p_debt_err").classList.toggle("show", el("p_debt").value!=="" && !(debt>0));
+  const ok = debt>0 && fV && tV && parseISO(tV)>=parseISO(fV);
+  if(!ok){ el("p_sum").textContent="—"; el("p_sub").textContent="Заполните сумму и даты"; el("p_tbl_wrap").style.display="none"; el("p_stats").innerHTML=""; return; }
+  const start=parseISO(fV), end=parseISO(tV);
+  const segs=segments395(start,end,el("p_pp326").checked);
+  let total=0;
+  const rows=segs.map(s=>{
+    const sum=debt*(s.rate/100)*s.days/s.yd; total+=sum;
+    const rc=pct(s.rate)+(s.capped?' <span class="tag cap" title="Ставка ограничена потолком 7,5% по п. 2 ПП РФ № 326">потолок</span>':'');
+    return `<tr><td>${fmtDate(s.from)} – ${fmtDate(s.to)}</td><td>${s.days}</td><td>${rc}</td><td>${s.yd}</td><td>${money(sum)}</td></tr>`;
+  }).join("");
+  el("p_tbody").innerHTML=rows;
+  el("p_tfoot").innerHTML=`<tr><td>Итого проценты</td><td>${dcount(start,end)}</td><td></td><td></td><td>${money(total)}</td></tr>`;
+  el("p_tbl_wrap").style.display="";
+  el("p_sum").textContent=rub(total);
+  el("p_sub").textContent=`Период ${fmtDate(start)} – ${fmtDate(end)} · ${dcount(start,end)} дн.`;
+  el("p_stats").innerHTML=`<div class="stat"><b>${dcount(start,end)}</b>дней просрочки</div><div class="stat"><b>${segs.length}</b>периодов ставки</div>`;
+}
+
+function recalcAll(){ try{ recalcDDU(); recalc395(); }catch(e){ console.error(e); } }
+
+/* ---------- UI wiring ---------- */
+function bindSeg(container, onchange){
+  container.addEventListener("click", e=>{
+    const b=e.target.closest("button"); if(!b) return;
+    [...container.children].forEach(x=>x.setAttribute("aria-pressed", x===b?"true":"false"));
+    onchange(b.dataset.v);
+  });
+}
+bindSeg(el("d_who"), v=>{ D.who=v; recalcDDU(); });
+bindSeg(el("d_shtraf_pct"), v=>{ D.shtraf=v; recalcDDU(); });
+
+el("d_rate").addEventListener("input", ()=>{ el("d_rate").dataset.touched="1"; recalcDDU(); });
+el("d_rate_reset").addEventListener("click", ()=>{ el("d_rate").dataset.touched="0"; recalcDDU(); });
+["d_due","d_end","d_pp326"].forEach(id=>el(id).addEventListener("input",recalcDDU));
+el("d_shtraf").addEventListener("change",()=>{ el("d_shtraf_box").style.display=el("d_shtraf").checked?"":"none"; recalcDDU(); });
+["p_from","p_to","p_pp326"].forEach(id=>el(id).addEventListener("input",recalc395));
+groupInput(el("d_price")); groupInput(el("d_morvred")); groupInput(el("p_debt"));
+
+/* tabs */
+document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",()=>{
+  document.querySelectorAll(".tab").forEach(x=>x.setAttribute("aria-selected", x===t?"true":"false"));
+  document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
+  el(t.getAttribute("aria-controls")).classList.add("active");
+}));
+
+/* theme toggle */
+const tb=el("themebtn");
+tb.addEventListener("click",()=>{
+  const cur=document.documentElement.getAttribute("data-theme");
+  const isDark = cur ? cur==="dark" : matchMedia("(prefers-color-scheme:dark)").matches;
+  document.documentElement.setAttribute("data-theme", isDark?"light":"dark");
+});
+
+/* seal + reference table */
+el("rateNow").textContent = pct(RATES[RATES.length-1][1]);
+el("verDate").textContent = VERIFIED;
+el("refGrid").innerHTML = [...RATES].reverse().map(([d,r])=>{
+  const [y,m,dd]=d.split("-"); return `<div><span>${dd}.${m}.${y}</span><span class="r">${pct(r)}</span></div>`;
+}).join("");
+
+/* defaults */
+el("d_end").value = todayISO();
+el("p_to").value = todayISO();
+
+recalcAll();
+</script>
+
+</body>
+</html>
